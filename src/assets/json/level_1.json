@@ -1,0 +1,144 @@
+[
+    {
+        "id": "01",
+        "name": "walls",
+        "position": [
+            -200,
+            50,
+            -20
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            10000,
+            100,
+            1
+        ],
+        "color": "#A6BD24",
+        "complete": false
+    },
+    {
+        "id": "02",
+        "name": "walls",
+        "position": [
+            -200,
+            50,
+            20
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            10000,
+            100,
+            1
+        ],
+        "color": "#A6BD24",
+        "complete": false
+    },
+    {
+        "id": 1,
+        "name": "ground",
+        "position": [
+            -200,
+            -0.8,
+             30
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            1000,
+            0.2,
+            100
+        ],
+        "color": "#A6BD24",
+        "complete": false
+    },
+    {
+    "id": 2,
+    "name": "platform-pusck",
+    "position": [
+        0,
+        0,
+        -2
+    ],
+    "rotation": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "args": [
+        20,
+        10,
+        0
+    ],
+    "texture": "platform-pusck"
+},
+    {
+        "id": 3,
+        "name": "christmas",
+        "position": [
+            -15,
+            5,
+            0
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            3,
+            10,
+            0.01
+        ],
+        "texture": "platform-pusck"
+    },
+    {
+        "id": 4,
+        "name": "christmas",
+        "position": [
+            50,
+            5,
+            0
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            3,
+            10,
+            0.01
+        ],
+        "texture": "platform-pusck"
+    },
+    {
+        "id": 5,
+        "name": "mountain",
+        "position": [
+            0,
+            5,
+            -50
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            250,
+            100,
+            0.01
+        ]
+    }
+]
