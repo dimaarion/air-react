@@ -106,6 +106,7 @@ useFrame(({camera})=>{
 
     }, [get]);
 
+
     useRopeJoint(ref, basket, [
         [-0.5, -6, -0.5],
         [-config.v, config.v, -config.v],
