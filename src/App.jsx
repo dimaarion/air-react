@@ -1,15 +1,18 @@
 import './App.css'
-import {Canvas} from "@react-three/fiber";
+import {Canvas, useLoader} from "@react-three/fiber";
 import {Physics} from "@react-three/rapier";
 import { Perf } from 'r3f-perf'
 import Player from "./Player.jsx";
 import {KeyboardControls, OrbitControls, OrthographicCamera, Sky, useGLTF} from "@react-three/drei";
 import Location_1 from "./scene/Location_1.jsx";
+import * as THREE from "three";
+import useGameStore from "./store.js";
 
 
 function App() {
     const {nodes, materials, animations} = useGLTF("./scene/scene.glb")
-
+    const loadedScene = useLoader(THREE.ObjectLoader, './json/Scene.json');
+    const level = useGameStore((state)=>state.level)
   return (
     <>
 
@@ -32,14 +35,22 @@ function App() {
                   { name: "jump", keys: ["Space"] },
               ]}
           >
-          <Physics gravity={[0,-50,0]} debug={true}>
+          <Physics key={level} gravity={[0,-50,0]} debug={false}>
               <Player />
-              <Location_1 nodes={nodes} materials={materials} animations={animations} />
+              <Location_1 nodes={nodes} loadedScene={loadedScene}   />
           </Physics>
           </KeyboardControls>
           <OrthographicCamera  />
          {/* <OrbitControls/>*/}
-          <Perf  position="top-left" />
+          <Perf  style={{
+              position:"fixed",
+              left:0,
+              right:0,
+              bottom:"-90%",
+              margin:"auto",
+              width:"400px",
+              height:"100px",
+          }} />
       </Canvas>
 
     </>

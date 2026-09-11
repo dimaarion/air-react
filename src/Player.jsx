@@ -1,4 +1,4 @@
-import {Billboard, Box, SpriteAnimator, useKeyboardControls} from "@react-three/drei";
+import {Line, SpriteAnimator, useKeyboardControls} from "@react-three/drei";
 import {BallCollider, CuboidCollider, RigidBody, useRopeJoint} from "@react-three/rapier";
 import {useFrame} from "@react-three/fiber";
 import {useEffect, useRef} from "react";
@@ -22,17 +22,19 @@ const config = {
         speed:{
             scale:0.5,
             value:0,
-            step:0.1
+            step:0.01
         }
     }
 }
+
+const configRef = useRef(config);
 const ref = useRef()
 const basket = useRef()
 const basketTexture = useRef()
 const ballon = useRef()
 const player = useRef()
 const burner = useRef()
-
+const ballonTexture = useRef()
     const vec = new Vector3()
 useFrame(({camera})=>{
     if(!ref.current)return
@@ -43,7 +45,7 @@ useFrame(({camera})=>{
     camera.lookAt(position.x,position.y - 5,position.z)
     ballon.current.position.x = position.x
     ballon.current.position.y = position.y
-    ballon.current.position.z = position.z + config.v
+    ballon.current.position.z = position.z + configRef.current.v
     ballon.current.rotation.z = ref.current.rotation().z
     ballon.current.rotation.x = 0
     ballon.current.rotation.y = 0
@@ -53,42 +55,46 @@ useFrame(({camera})=>{
     const posBasket = basket.current.translation()
     basketTexture.current.position.x = posBasket.x
     basketTexture.current.position.y = posBasket.y
-    basketTexture.current.position.z = posBasket.z + config.v
+    basketTexture.current.position.z = posBasket.z + configRef.current.v
     basketTexture.current.rotation.z = basket.current.rotation().z * 2
     basketTexture.current.rotation.x = 0
     basketTexture.current.rotation.y = 0
 
-    let y = 0.5
+    let y = 1
     let x = 0
-    burner.current.scale.x = config.burner.speed.scale
-    burner.current.scale.y = config.burner.speed.scale
-    burner.current.position.y = burner.current.scale.y /0.3
-    const { forward, backward, left, right, jump } = get();
+    const { forward, backward, right } = get();
     if(forward){
         if(ballon.current.position.y < 40){
             y = 10
-            config.burner.speed.value += config.burner.speed.step
+
         }
+
+        if(burner.current.scale.y < 1){
+            configRef.current.burner.speed.value +=configRef.current.burner.speed.step
+        }
+        ref.current.setBodyType(0, true);
     }
 
 
     if(backward){
         y = -10
-        config.burner.speed.value -= config.burner.speed.step
+        if(burner.current.scale.y > 0){
+            configRef.current.burner.speed.value -=configRef.current.burner.speed.step
+        }
+        ref.current.setBodyType(0, true);
     }
+
+
     if(right){
         //x = 10
     }
-    burner.current.scale.y = config.burner.speed.value
-    burner.current.scale.x = config.burner.speed.value
-    if(burner.current.scale.y >= 2){
-        burner.current.scale.y = 2
-        burner.current.scale.x = 2
-    }
-    if(burner.current.scale.y <= 0.5){
-        burner.current.scale.y = 0.5
-        burner.current.scale.x = 0.5
-    }
+
+
+
+if(configRef.current.burner.speed.value <= 0){
+    y = -5
+}
+
     if(ballon.current.position.y > 15){
         x = 10
     }
@@ -98,7 +104,9 @@ useFrame(({camera})=>{
     if(ballon.current.position.y > 30){
         x = 25
     }
-
+    let ballonScale = configRef.current.burner.speed.value
+    burner.current.scale.set(configRef.current.burner.speed.value,configRef.current.burner.speed.value,0)
+    ballonTexture.current.scale.set(1 + ballonScale,ballonTexture.current.scale.y,0)
     ref.current?.setLinvel({ x: x, y: y, z: 0 },true)
 })
 
@@ -131,20 +139,25 @@ useFrame(({camera})=>{
 
     return<group >
         <group ref={ballon}>
+            <group ref={ballonTexture}>
                 <PlaneTexture name={"ballon_0"} position={[0,0,0]} scale={[4,7]} rotation={[0,0,0]}/>
+            </group>
             <group position={[0,config.burner.position.y,0]}>
                 <PlaneTexture name={"burner_0"}  scale={[1.5,1.5]} rotation={[0,0,0]}/>
-                <SpriteAnimator ref={burner} fps={8}
-                                position={[0, 1.5, 0]}
-                                startFrame={0}
-                                autoPlay={true}
-                                loop={true}
-                                scale={2}
-                                textureImageURL={'./img/fire.png'}
-                                textureDataURL={'./json/frame.json'}
-                                alphaTest={0.01}
-                                asSprite={true}
-                />
+                <group ref={burner} position={[0,1,0]}>
+                    <SpriteAnimator  fps={8}
+                                    position={[0, 0.8, 0]}
+                                    startFrame={0}
+                                    autoPlay={true}
+                                    loop={true}
+                                    scale={2}
+                                    textureImageURL={'./img/fire.png'}
+                                    textureDataURL={'./json/frame.json'}
+                                    alphaTest={0.5}
+                                    asSprite={true}
+                    />
+                </group>
+
 
             </group>
         </group>
@@ -153,24 +166,30 @@ useFrame(({camera})=>{
         </group>
 
 
-        <RigidBody ref={ref} position={[0,15,0]} enabledRotations={[false, false, false]}  type={"dynamic"}>
-           <BallCollider args={[2]} />
+        <RigidBody ref={ref} position={[5,10,0]} enabledRotations={[false, false, false]}  type={"fixed"}>
+           <BallCollider args={[3]} />
         </RigidBody>
-        <RigidBody enabledRotations={[false, false, true]} ref={basket} position={[0,5,0]} type={"dynamic"} colliders={"cuboid"}>
+        <RigidBody enabledRotations={[false, false, true]} ref={basket} position={[0,2,0]} type={"dynamic"} colliders={"cuboid"}>
             <CuboidCollider position={[0,-config.v,0]} args={[config.v,config.t,config.v]} />
             <CuboidCollider position={[-config.v,0,0]} args={[config.t,config.v,config.v]} />
             <CuboidCollider position={[config.v,0,0]} args={[config.t,config.v,config.v]} />
             <CuboidCollider position={[0,0,config.v]} args={[config.v,config.v,config.t]} />
             <CuboidCollider position={[0,0,-config.v]} args={[config.v,config.v,config.t]} />
         </RigidBody>
-        <RigidBody ref={player} position={[0,5,0]} type={"dynamic"} colliders={"cuboid"}>
+        <RigidBody ref={player} position={[0,5,0]} type={"dynamic"} userData={{name:"player"}} colliders={"cuboid"}>
             <group>
                 <PlaneTexture name={"player"} position={[0,0,0]} scale={[2,4]} rotation={[0,0,0]}/>
             </group>
-            <CuboidCollider position={[0,0,0]} args={[1,2,1]} />
+            <CuboidCollider name={"player"} position={[0,0,0]} args={[1,2,1]} />
         </RigidBody>
 
+        <Line
+            points={[[-10, 100],[-100,80]]}       // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
+            color="red"                   // Default
+            lineWidth={15}                   // In pixels (default)
 
+
+        />
 
 
     </group>
